@@ -1,0 +1,85 @@
+\section{Problem Formulation}
+\label{section:problem}
+Denote $s$ as state, $a$ as action, $\theta$ as model parameters,
+let's first take a look at DQN algorithm:
+\begin{algorithm}[H]
+  \caption{DQN}
+  \begin{algorithmic}[1]
+    \STATE Initialize \begin{math} Q(s,a,\theta)\end{math} with random weights \begin{math}\theta _0 \end{math}
+    \STATE Initialize Experience Replay buffer B
+    \STATE Initialize exploration procedure Explore(·)
+    \FOR{$i=1,2,3...,N$}
+        \STATE\begin{math}y^i_{s,a} = E_B[r+\gamma \max_{a^{'}} Q(s^{'},a^{'},\theta _{i-1})|s,a]\end{math}
+        \STATE\begin{math}\theta _i\approx \arg\min_{\theta}E_B[(y^i_{s,a}-Q(s,a,\theta))^2]\end{math}
+        \STATE Explore(·), update B
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+There are various types of errors that arise due to the combination of Q-learning and function approximation in the DQN algorithm. Let \begin{math} \delta _i=Q(s,a,\theta _i)-Q^*(s,a)\end{math}, which can be rewritten as: 
+\[\delta _i=Q(s,a,\theta _i)-y^i_{s,a}+y^i_{s,a}-\hat{y}^i_{s,a}+\hat{y}^i_{s,a}-Q^*(s,a)\]
+where \begin{math}\hat{y}^i_{s,a}\end{math} is true target:
+\[\hat{y}^i_{s,a}=E_B[r+\gamma \max_{a^{'}}(y^{i-1}_{s^{'},a^{'}})|s,a]\]
+If we can reduce the variance of \begin{math} \delta _i\end{math}, then the training progress will be more stable. To analyze the variance, let's first split the formula above into three parts:
+\begin{itemize}
+    \item Target Approximation Error (TAE): \begin{math}Z^i_{s,a}=Q(s,a,\theta _i)-y^i_{s,a}\end{math}
+    \item Overestimation Error: \begin{math}R^i_{s,a}=y^i_{s,a}-\hat{y}^i_{s,a}\end{math}
+    \item Optimality Difference: \begin{math}\hat{y}^i_{s,a}-Q^*(s,a)\end{math}
+\end{itemize}
+Optimality difference can be seen as the error of a standard tabular Q-learning. On the other hand, according to work proposed by Thrun & Schwartz (1993), assuming \begin{math}Z^i_{s,a}\end{math} is a random variable uniformly distributed in the interval \begin{math}[-\epsilon,\epsilon]\end{math}, then the expected overestimation errors \begin{math}E_Z[R^i_{s,a}]\end{math} are upper bounded by  \begin{math}\gamma\epsilon\frac{n-1}{n+1}\end{math} (where n is the number of applicable actions in state s). \par Following from the mentioned observation, the magnitude of the bias is controlled by the variance of the TAE, and we'll focus on how to reduce the variance from TAE in the rest of this report.
+\par In this work, two methods are mentioned: Ensemble DQN and Averaged DQN. Ensemble DQN owns K model weights and calculate the predicted action-value by averaging the output of K models:
+\begin{algorithm}[H]
+  \caption{Ensemble DQN}
+  \begin{algorithmic}[1]
+    \STATE Initialize K Q-Networks \begin{math} Q(s,a,\theta ^k)\end{math} with random weights \begin{math}\theta ^k_0 \end{math} for \begin{math} k\in\{1,...,K\}\end{math}
+    \STATE Initialize Experience Replay buffer B
+    \STATE Initialize exploration procedure Explore(·)
+    \FOR{$i=1,2,3...,N$}
+        \STATE\begin{math}Q^E_{i-1}(s,a)=\frac{1}{K}\sum_{k=1}^{K}Q(s,a,\theta^k_{i-1})\end{math}
+        \STATE\begin{math}y^i_{s,a} = E_B[r+\gamma \max_{a^{'}} Q^E_{i-1}(s^{'},a^{'})|s,a]\end{math}
+        \FOR{$k=1,2,3...,K$}
+            \STATE\begin{math}\theta ^k_i\approx \arg\min_{\theta}E_B[(y^i_{s,a}-Q(s,a,\theta^k))^2]\end{math}
+        \ENDFOR
+        \STATE Explore(·), update B
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+Averaged DQN preserves weights from K iterations before and averaging the output to predict the action-value.
+\begin{algorithm}[H]
+  \caption{Averaged DQN}
+  \begin{algorithmic}[1]
+    \STATE Initialize \begin{math} Q(s,a,\theta)\end{math} with random weights \begin{math}\theta _0 \end{math}
+    \STATE Initialize Experience Replay buffer B
+    \STATE Initialize exploration procedure Explore(·)
+    \FOR{$i=1,2,3...,N$}
+        \STATE\begin{math}Q^A_{i-1}(s,a)=\frac{1}{K}\sum_{k=1}^{K}Q(s,a,\theta{i-k})\end{math}
+        \STATE\begin{math}y^i_{s,a} = E_B[r+\gamma \max_{a^{'}} Q^A_{i-1}(s^{'},a^{'})|s,a]\end{math}
+        \STATE\begin{math}\theta _i\approx \arg\min_{\theta}E_B[(y^i_{s,a}-Q(s,a,\theta))^2]\end{math}
+        \STATE Explore(·), update B
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+In the next section, we'll go into the details of how they reduce the variance. Note that the whole analysis assumes that TAE is a random process such that in Averaged DQN:
+\begin{itemize}
+    \item \begin{math}E[Z^i_{s,a}]=0\end{math}
+    \item \begin{math}Var[Z^i_{s,a}]=\sigma ^2_s\end{math}
+    \item \begin{math}Cov[Z^i_{s,a},Z^j_{s^{'},a^{'}}]=0\end{math} for all \begin{math}i\neq j\end{math}
+and \begin{math}Cov[Z^i_{s,a},Z^i_{s^{'},a}]=0\end{math} for all \begin{math}s\neq s^'\end{math}
+\end{itemize} 
+and in Ensemble DQN: 
+\begin{itemize}
+    \item \begin{math}E[Z^{k,i}_{s,a}]=0\end{math}
+    \item \begin{math}Var[Z^{k,i}_{s,a}]=\sigma ^2_s\end{math}
+    \item \begin{math}Cov[Z^{k,i}_{s,a},Z^{k^{'},j}_{s^{'},a}]=0\end{math} for all \begin{math}i\neq j\end{math}
+and \begin{math}Cov[Z^{k,i}_{s,a},Z^{k^{'},j}_{s^{'},a^{'}}]=0\end{math} for all \begin{math}k\neq k^'\end{math}
+\end{itemize}
+In addition, the overestimation error is eliminated by considering a fixed policy for updating the target values.Also, since a zero reward has no effect on variance calculations, we can just assume \begin{math}r=0\end{math}
+everywhere.
+
+\iffalse
+Please present the formulation in this section. You may want to cover the following aspects:
+\begin{itemize}
+    \item Your notations (e.g. MDPs, value functions, function approximators,...etc)
+    \item The optimization problem of interest
+    \item The technical assumptions
+\end{itemize}
+\fi

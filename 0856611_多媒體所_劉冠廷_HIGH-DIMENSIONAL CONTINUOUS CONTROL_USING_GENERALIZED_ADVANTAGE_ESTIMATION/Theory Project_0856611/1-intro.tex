@@ -1,0 +1,14 @@
+\section{Introduction}
+\label{section:intro}
+For a long time,scholars make effort on better estimation for reinforcement learning,for example:
+estimator of value function or advantage function.REINFORCE(Monte Carlo) provided a unbiased estimator but with large cost of variance.Temporal difference offered another estimator with some bias but less variance.
+Policy gradient methods directly optimize the cumulative reward and can be applied to neural network simply.
+Two challenges conquered by this paper.
+\begin{itemize}
+    \item {\bf Large number of samples typically required.}\newline
+          {\hspace{1cm}We know that reinforcement learning surpasses human but with less efficiency.That's why we need tremendous amount of data.This problem can be
+          solved by estimator with lower variance at cost of tolerable bias.\hfill}
+    \item {\bf Stable and steady improvement.}\newline
+          {\hspace{1cm}In practice,line search (gradient descent) might fail somehow in reinforcement learning.For this problem trust region optimization procedure can deal with it for both the policy and the value function.\hfill}          
+
+\end{itemize}

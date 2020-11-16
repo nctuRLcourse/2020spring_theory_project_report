@@ -1,0 +1,17 @@
+\section{Introduction}
+\label{section:intro}
+
+The recent Deep Q-Network algorithm (DQN) was the first to successfully combine Deep Neural Network (DNN), a powerful non-linear approximation technique, with the Q-learning algorithm. However, the max operation in Q-learning can lead to overestimation of state-action values in the presence of noise.
+\par In this work, variance analysis that explains some of the DQN problems are done, and later on, a solution called Averaged-DQN is proposed to solve the overestimation problem. It extends DQN by taking Q-values learned from few iterations before and averaging those values to produce the current action-value estimate. In the end, also, showing better results in the experiments done on Arcade Lerning Enviroment (ALE).
+\par Different from Double-DQN, which tackle the overestimation problem by replacing the positive bias into negative one, Averaged-DQN directly reduce the variance and get better results.
+\par This work greatly increases the stability of Deep Q-learning algorithms, but only adds the computation time in linear growth. Also, only a few changes are made from DQN to Averaged-DQN, which means it's easy to implement even if one don't know the theory behind it. All of these features make the proposed method valuable.
+
+\iffalse
+Please provide a clear overview of the selected paper. You may want to discuss the following aspects:
+\begin{itemize}
+    \item The main research challenges tackled by the paper
+    \item The high-level technical insights into the problem of interest
+    \item The main contributions of the paper (compared to the prior works)
+    \item Your personal perspective on the proposed method
+\end{itemize}
+\fi

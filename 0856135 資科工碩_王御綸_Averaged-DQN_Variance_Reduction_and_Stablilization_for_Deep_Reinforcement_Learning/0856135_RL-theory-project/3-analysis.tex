@@ -1,0 +1,141 @@
+\section{Theoretical Analysis}
+\label{section:analysis}
+
+\subsection{Ensemble-DQN}
+Following the Ensemble-DQN algorithm mentioned above:
+\begin{align}
+Q^E_i(s_0,a)&=\frac{1}{K}\sum^K_{k=1}Q(s_0,a,\theta^k_i)\\
+            &=\frac{1}{K}\sum^K_{k=1}(Z^{k,i}_{s_{0},a}+y^i_{s_{0},a})\\
+            &=\frac{1}{K}\sum^K_{k=1}Z^{k,i}_{s_{0},a}+y^i_{s_{0},a}\\
+            &=\frac{1}{K}\sum^K_{k=1}Z^{k,i}_{s_{0},a}+\gamma Q^E_{i-1}(s_1,a)\\
+            &=\frac{1}{K}\sum^K_{k=1}Z^{k,i}_{s_{0},a}+\frac{\gamma}{K}\sum^K_{k=1}Z^{k,i-1}_{s_{1},a}+\gamma y^{i-1}_{s_{2},a}
+\end{align}
+We can get (4) from (3) since we assume that the reward is 0 in everywhere. In addition, \begin{math}y^{j}_{s_{N-1},a}=0\end{math} in terminal states. By iteratively expanding \begin{math}y^{i-1}_{s_{2},a}\end{math}, we can get:
+\[
+Q^E_i(s_0,a)=\sum^{N-1}_{n=0}\gamma ^n\frac{1}{K}\sum^K_{k=1}Z^{k,i-n}_{s_{n},a}
+\]
+We also assume that TAEs are uncorrelated, meaning that \begin{math}Var(\sum X_i)=\sum Var(X_i)\end{math}. In the end, given \begin{math}Var[X]=E[X^{2}]+E[X]^2\end{math} and \begin{math}E[Z^{k,i}_{s,a}]=0\end{math}:
+\[
+Var[Q^E_{i}(s_{0},a)]=\sum^{N-1}_{n=0}\frac{1}{K}\gamma ^{2n}\sigma^2_{s_n}
+\]
+\subsection{Averaged-DQN}
+Following the Averaged-DQN algorithm mentioned above:
+\begin{align}
+Q^E_i(s_0,a)&=\frac{1}{K}\sum^K_{k=1}Q(s_0,a,\theta_{i+1-k})\\
+            &=\frac{1}{K}\sum^K_{k=1}(Z^{i+1-k}_{s_{0},a}+y^{i+1-k}_{s_{0},a})\\
+            &=\frac{1}{K}\sum^K_{k=1}Z^{i+1-k}_{s_{0},a}+\frac{\gamma}{K}\sum^K_{k=1}Q^A_{i-k}(s_{1},a)\\
+            &=\frac{1}{K}\sum^K_{k=1}Z^{i+1-k}_{s_{0},a}+\frac{\gamma}{K^2}\sum^K_{k=1}\sum^K_{k^{'}=1}Q(s_{1},a,\theta_{i+1-k-k^{'}})
+\end{align}
+Similar as before, assume reward is 0 everywhere, then we get (8) from (7). Also,  \begin{math}y^{j}_{s_{N-1},a}=0\end{math} in terminal states. By iteratively expanding
+\begin{math}Q(s_{1},a,\theta_{i+1-k-k^{'}})\end{math}, we can get:
+\begin{equation}
+\begin{aligned}
+Q^A_{i}(s_{0},a) = \frac{1}{K}\sum^K_{k_{1}=1}Z^{i+1-k_{1}}_{s_{0},a}
++\frac{\gamma}{K^2}\sum^K_{k_{1}=1}\sum^K_{k_{2}=1}Z^{i+1-k_{1}-k_{2}}_{s_{1},a}
++...\\
++\frac{\gamma^{N-1}}{K^N}\sum^K_{k_{1}=1}\sum^K_{k_{2}=1}...\sum^K_{k_{N}=1}Z^{i+1-k_{1}-k_{2}-...-k_{N}}_{s_{M-1},a}
+\end{aligned}
+\end{equation}
+To calculate \begin{math}Var[Q^A_{i}(s_{0},a)]\end{math} easier, we'll compute the variance separately in equation (10) and sum them up. Note that assumptions like \begin{math}Var(\sum X_i)=\sum Var(X_i)\end{math} and \begin{math}Var[X]=E[X^{2}]+E[X]^2\end{math} will also be used in here.
+\par For \begin{math}C\in \{1,2,...,N\}\end{math}, denote:
+\begin{equation}
+V_C = Var[\frac{1}{K^C}\sum^K_{k_{1}=1}\sum^K_{k_{2}=1}...\sum^K_{k_{C}=1}Z_{k_{1}+k_{2}+...+k_{C}}]
+\end{equation}
+where \begin{math}Z_C,Z_{C+1},...,Z_{K*C}\end{math} are independent and identically distributed TAE random variables, with \begin{math}E[Z_{i}]=0\end{math} and \begin{math}Var[Z_{i}]=\sigma^2_z\end{math}. Then:
+\[
+\begin{aligned}
+V_C &=\frac{1}{K^{2C}}E[(\sum^{KC}_{j=C}n^C_{j}Z_{j})^{2}]\\
+    &=\frac{\sigma^2_z}{K^{2C}}\sum^{KC}_{j=C}(n^C_{j})^2
+\end{aligned}
+\]
+where \begin{math}n^C_{j}\end{math} denotes how many times \begin{math}Z_{j}\end{math} is counted in equation (11), and this can be found by converting the question to the number of solutions of the following equation:
+\begin{equation}
+k_{1}+k_{2}+...+k_{C}=j
+\end{equation}
+for \begin{math}k_{1},k_{2},...,k_{C}\in\{1,2,...,K\}\end{math}. After defining the new question,  \begin{math}n^C_{j}\end{math} can be written recursively:
+\[
+n^C_{j}=\sum^K_{i=1}n^{C-1}_{j-i}
+\]
+To be more precisely, consider equation (12) as distributing j same things into C same groups. Now, i items are given to a group, then the solution of the rest is \begin{math}n^C-1_{j-i}\end{math}. In the end, sum up the numbers of solution from \begin{math}i=1\end{math} to \begin{math}i=K\end{math}, and the answer will be \begin{math}n^C_{j}\end{math}.
+\par Since the goal of this calculation is to bound the variance reduction coefficient, we will calculate the solution in the frequency domain, in which the bound can be easily obtained. Denote
+\[
+u^K_{j}=
+\begin{cases}
+    1,& \text{if } j\in\{1,2,...,K\}\\
+    0,& \text{otherwise}
+\end{cases}
+\]
+Trivially, \begin{math}n^C_{1}\end{math} will equal to \begin{math}u^K_{j}\end{math} for any \begin{math}j\in\mathbb{Z}\end{math} when \begin{math}C=1\end{math}, and \begin{math}n^C_{j}\end{math} can be written  recursively as:
+\[
+\begin{aligned}
+n^C_{j} &=\sum^\infty_{i=-\infty}n^{C-1}_{j-i}\cdot u^K_{i}\\
+        &\equiv(n^{C-1}_{j-i}\circledast u^K)_j\\
+        &=(u^K\circledast u^K...\circledast u^K)_j
+\end{aligned}
+\]
+where \begin{math}\circledast\end{math} is the discrete convolution.
+\par Next, denote the Discrete Fourier Transform (DFT) of \begin{math}u^K=(u^K_{m})^{M-1}_{m=0}\end{math} as \begin{math}U=(U_{m})^{M-1}_{m=0}\end{math}, and by using Parseval’s theorem, we have:
+\[
+\begin{aligned}
+V_C &=\frac{\sigma^2_z}{K^{2C}}\sum^{M-1}_{m=0}|u^K\circledast u^K...\circledast u^K)_{m}|^2\\
+    &=\frac{\sigma^2_z}{K^{2C}}\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}|^{2C}
+\end{aligned}
+\]
+where N is the length of the vectors u and U and is taken large enough so that the sum includes all nonzero elements of the convolution. Finally, we can sum up all of $V_C$:
+\[
+\begin{aligned}
+Var[Q^A_{i}(s_{0},a)]   &=\sum^N_{n=1}V_n\gamma^{2(n-1)}\\
+                        &=\sum^N_{n=1}\frac{1}{K^{2n}}\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}|^{2n}\gamma^{2(n-1)}\sigma^2_{s_{m}}
+\end{aligned}
+\]
+\subsection{Coefficient Bounding Analysis}
+First, let's calculate variance of original DQN, which is similar with Ensemble-DQN:
+\[
+\begin{aligned}
+Q^{DQN}(s_{0},a,\theta_{i}) &=Z^i_{s_{0},a}+y^i_{s_{0},a}\\
+                            &=Z^i_{s_{0},a}+\gamma Q(s_{1},a,\theta_{i-1})\\
+                            &=Z^i_{s_{0},a}+\gamma(Z^{i-1}_{s_{1},a}+y^{i-1}_{s_{1},a})
+\end{aligned}
+\]
+And the variance will be:
+\[
+Var[Q^{DQN}(s_{0},a,\theta_{i})]=\sum^{N-1}_{n=0}\gamma^{2n}\sigma^2_{s_{m}}
+\]
+According to the results from above, 
+\[
+\begin{aligned}
+&Var[Q^E_{i}(s_{0},a)]=\sum^{N-1}_{n=0}\frac{1}{K}\gamma ^{2n}\sigma^2_{s_n}\\
+&Var[Q^A_{i}(s_{0},a)]=\sum^N_{n=1}\frac{1}{K^{2n}}\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}|^{2n}\gamma^{2(n-1)}\sigma^2_{s_{m}}
+\end{aligned}
+\]
+We can easily find out the difference between Ensemble-DQN and DQN:
+\newtheorem{prop1}{Proposition}
+\begin{prop1}
+Variance of Ensemble-DQN is K times smaller than DQN
+\end{prop1}
+As for Averaged-DQN, let's first do some change to the equation:
+\[
+\begin{aligned}
+Var[Q^A_{i}(s_{0},a)]   &=\sum^N_{n=1}\frac{1}{K^{2n}}\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}|^{2n}\gamma^{2(n-1)}\sigma^2_{s_{m}}\\
+                        &=\sum^{N-1}_{n=0}\frac{1}{K^{2(n+1)}}\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}|^{2(n+1)}\gamma^{2n}\sigma^2_{s_{m}}\\
+\end{aligned}
+\]
+then analyze the difference between Averaged-DQN and DQN by using Parseval’s theorem, and the facts that \begin{math}\frac{1}{K}|U_{m}|\leq 1\end{math}, \begin{math}\frac{1}{K}|U_{m}|=1 \text{ only if } n=0\end{math}:
+\[
+\begin{aligned}
+\frac{1}{K^{2(n+1)}}\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}|^{2(n+1)}&=\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}/K|^{2(m+1)}\\
+&<\frac{1}{M}\sum^{M-1}_{m=0}|U_{m}/K|^{2}\\
+&=\frac{1}{K^2}\sum^{M-1}_{m=0}|u^K_{m}|^2\\
+&=1/K
+\end{aligned}
+\]
+And this gives the following conclusion:
+\newtheorem{prop2}[prop1]{Proposition}
+\begin{prop2}
+Variance of Averaged-DQN is at lease K times smaller than DQN, and even smaller than Ensemble-DQN
+\end{prop2}
+
+\iffalse
+Please present the theoretical analysis in this section. Moreover, please formally state the major theoretical results using theorem/proposition/corollary/lemma environments. Also, please clearly highlight your new proofs or extensions (if any).
+\fi
+

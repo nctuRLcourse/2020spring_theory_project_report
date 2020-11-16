@@ -1,0 +1,14 @@
+\section{Problem Formulation}
+\label{section:problem}
+Consider undiscounted formulation of policy optimization first:
+\begin{itemize}
+    \item Initial State $S_0 \sim P_0$
+    \item Trajectory $(S_0,a_0,S_1,a_1)$ for $a_t \sim \pi(a_t,S_t)$,$S_{t+1} \sim P(S_{t+1},|S_t,a_t)$
+    \item Return $r_t = r(S_t,a_t,S_{t+1})$
+\end{itemize}
+Note that we assume that $\sum_{n=0}^{+\infty} r_t < +\infty$.\newline
+Also,for the discounted reward, the discount factor $\gamma$ will be used in bias-variance trade-off.\newline
+We can also rewrite the following formula.\newline
+\begin{align*}
+  {\sum_{n=-\infty}^{+\infty} \gamma^tr_t} &= {\sum_{n=-\infty}^{+\infty} r^*_t} ~~~~~~,for~~~~~~{\gamma^tr_t} = {r^*_t}
+\end{align*}

@@ -1,0 +1,90 @@
+\section{Theoretical Analysis}.
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\subsection{Model-based optimization}
+\begin{theorem}[Global Convergence of Gradient Methods]
+Suppose $C(K_0)$ is finite, and $\mu > 0$. Given step size, N, and the update rule, the gradient methods have the performance bound: 
+\begin{equation}
+    C(K_N)-C(K^*)\leq\epsilon
+\end{equation}\newline
+\begin{itemize}
+\item Gauss-Newton method:\newline
+The step size is
+\begin{equation}
+\eta = 1  
+\end{equation}\newline
+, with the update rule:
+\begin{equation}
+K_{n+1}=K_n-\eta(R+B^T P_{K_n}B)^{-1}\nabla C(K_n)\Sigma_{K_n}^{-1}
+\end{equation}\newline
+, and 
+\begin{equation}
+N \geq \frac{\|\Sigma_{K^*}\|}{\mu}log
+\frac{C(K_0)-C(K^*)}{\epsilon}
+\end{equation}\newline
+\item Natural policy gradient:\newline
+The step size is 
+\begin{equation}
+\eta = \frac{1}{\|R\|+\frac{\|B\|^2C(K_0)}{\mu}}
+\end{equation}\newline
+, with the update rule:
+\begin{equation}
+K_{n+1}=K_n-\eta\nabla C(K_n)\Sigma_{K_n}^{-1}
+\end{equation}\newline
+, and 
+\begin{equation}
+N\geq\frac{\|\Sigma_{K^*}\|}{\mu}(\frac{\|R\|}{\sigma_{min}(R)}+\frac{\|B\|^2C(K_0)}{\mu\sigma_{min}(R)})log\frac{C(K_0)-C(K^*)}{\epsilon}
+\end{equation}\newline
+\item Gradient descent:\newline
+The step size is 
+\begin{equation}
+\eta = poly(\frac{\mu\sigma_{min}(Q)}{C(K_0)},\frac{1}{\|A\|},\frac{1}{\|B\|},\frac{1}{\|R\|},\sigma_{min}(R))
+\end{equation}\newline
+, with the update rule:
+\begin{equation}
+{K_{n+1}} = {K_n} - \eta\nabla{C}({K_n})
+\end{equation}\newline
+, and 
+\begin{equation}
+N\geq\frac{\|\Sigma_{K^*}\|}{\mu}log\frac{C(K_0)-C(K^*)}{\epsilon}poly(\frac{C(K_0)}{\mu\sigma_{min}(Q)},\|A\|,\|B\|,\|R\|,\frac{1}{\sigma_{min}(R)})
+\end{equation}\newline
+\end{itemize}
+\end{theorem}
+
+\subsection{Model free optimization}
+\begin{theorem}[Global Convergence in the model free setting]
+For model free enviroment, given step size, N, the update rules, and the algorithm mentioned in the paper (Algorithm 1: Model-Free Policy Gradient Estimation), it also has the performance bound:
+\begin{equation}
+    C(K_N)-C(K^*)\leq\epsilon
+\end{equation}\newline
+\begin{itemize}
+    \item Natural policy gradient:
+The step size is
+\begin{equation}
+\eta = \frac{1}{\|R\|+\frac{\|B\|^2C(K_0)}{\mu}}
+\end{equation}\newline
+, with the update rule:
+\begin{equation}
+{K_{n+1}} = {K_n} - \eta\hat{\nabla{C}({K_n})}\hat{\Sigma_{K_n}^{-1}}
+\end{equation}\newline
+, and 
+\begin{equation}
+N\geq\frac{\|\Sigma_{K^*}\|}{\mu}(\frac{\|R\|}{\sigma_{min}(R)}+\frac{\|B\|^2C(K_0)}{\mu\sigma_{min}(R)})log\frac{C(K_0)-C(K^*)}{\epsilon}
+\end{equation}\newline   
+    \item Gradient descent:\newline
+The step size is 
+\begin{equation}
+\eta = poly(\frac{\mu\sigma_{min}(Q)}{C(K_0)},\frac{1}{\|A\|},\frac{1}{\|B\|},\frac{1}{\|R\|},\sigma_{min}(R))
+\end{equation}\newline
+, with the update rule:
+\begin{equation}
+{K_{n+1}} = {K_n} - \eta\hat{\nabla{C}({K_n})}
+\end{equation}\newline
+, and 
+\begin{equation}
+N\geq\frac{\|\Sigma_{K^*}\|}{\mu}log\frac{C(K_0)-C(K^*)}{\epsilon}poly(\frac{C(K_0)}{\mu\sigma_{min}(Q)},\|A\|,\|B\|,\|R\|,\frac{1}{\sigma_{min}(R)})
+\end{equation}\newline
+\end{itemize}
+\end{theorem}

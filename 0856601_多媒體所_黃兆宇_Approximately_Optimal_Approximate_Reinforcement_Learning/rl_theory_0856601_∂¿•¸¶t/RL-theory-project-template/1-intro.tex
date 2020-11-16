@@ -1,0 +1,49 @@
+\section{Introduction}
+\label{section:intro}
+In this paper [\cite{DBLP:Kakade02approximatelyoptimal}], the author present the \emph{conservative policy iteration} algorithm, which finds an "approximately" optimal policy. To achieve this goal, two algorithms are introduced, first called \emph{restart distribution}, and second called \emph{"approximate" greedy policy chooser}.In following subsections, an overview of this paper will be provided.
+\begin{itemize}
+
+    \item Main challenges of this paper
+    % Talk about 3 questions
+    \paragraph{}
+    For the problem of finding the "approximately" optimal policy, three questions are the author desire answers to:
+    \begin{enumerate}
+    \item Is there some performance measure that is guaranteed to improve at every step?
+    \item How difficult is it to verify if a particular update improves this measure?
+    \item After a reasonable number of policy updates, what performance level is obtained?
+    \\
+    \end{enumerate}
+   
+    
+    \item Finding the "Approximate" optimal policy
+    % The high-level technical insights into the problem of interest
+    \paragraph{}
+    The optimal policy is the policy which simultaneously maximizes values for all states. The policy can be updated in a iterative process, the problem this paper want to solve is to find a policy which is close to the optimal policy in the reasonable policy updates and evaluate the performance level of the policy found by the algorithm, this policy is called "approximate" optimal policy. In addition, the update process of this algorithm should guaranteed to improve the policy at every step.
+    \\
+    
+    \item Main contributions
+    % Talk about two examples
+    \paragraph{}
+    As the author stated in the paper, two kinds of methods are used to find the optimal policy, 
+    \emph{approximate value function methods} and \emph{policy gradient methods}. But both of them can't give satisfactory answers to the three questions mentioned in "Main challenges" subsection. And the new algorithm presented in this paper can address these three questions. 
+    \paragraph{}
+    As the author claimed in the paper, the algorithm can:
+    \begin{enumerate}
+    \item Improve the performance metric.
+    \item Terminate in a small number of timesteps.
+    \item Returns an "approximately" optimal policy.
+    \\
+    \end{enumerate}
+    
+    \item Personal perspective on the proposed method \\
+    In reinforcement learning, sometimes we want to find an optimal solution, we
+    find the "best" result based on the information we have in current time step
+    (ex. state information), but the solution we find currently may not really 
+    leads us to the true optimal value, because there may be some information we don't know in other states, this problem will effect the performance much especially when the state probability distribution is very nonuniform. So the "Exploration" will be important for a reinforcement learning algorithm. For example, in Deep Q network (DQN) [\cite{DBLP:journals/corr/MnihKSGAWR13}], the $\epsilon$-greedy algorithm is used to increase the
+    exploration when the algorithm choosing action in each episodes and in Deep Deterministic Policy Gradient (DDPG) [\cite{DBLP:lillicrap2015continuous}], a random noise will added to the choosing actions to help the actions get more information from the state
+    that is rarely visited. In this paper, the author also want to improve this by applying a restart distribution method, this method make the algorithm more sensitive to the policy improvement in unlikely states. \\
+    For the greedy policy chooser, the author proves it can
+    guarantee a policy improvement at every step and the performance can also be measured after reasonable policy updates.
+    
+    % 
+\end{itemize}

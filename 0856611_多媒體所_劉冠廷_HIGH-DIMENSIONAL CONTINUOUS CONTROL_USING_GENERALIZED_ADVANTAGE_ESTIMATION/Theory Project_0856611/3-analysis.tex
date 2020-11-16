@@ -1,0 +1,68 @@
+\section{Theoretical Analysis}
+\label{section:analysis}
+\begin{itemize}
+    \item\large{\bf Policy Gradient}\\
+        {\hspace{1cm}repeatedly estimating the gradient 
+        g:=$\mathbb{E}$\Bigg[$\sum_{t=0}^{+\infty}\Psi_t\nabla_\theta log\pi_\theta(a_t|S_t)$\Bigg]\hfill}\\
+    where $\Psi_t$ may be one of the following:\\
+    1.~{\large$\sum_{t=0}^{\infty}r_t$}\\
+    2.~\large${\sum_{t=0}^{\infty}{r_{t^*}}}$ (reward after following action $a_t$)\\
+    3.~{\large$\sum_{t^*=t}^{\infty}r_{t^*}-b(S_{t^*})$} (baseline version of 2)\\
+    4.~$Q^{\pi}(S_t,a_t)$\\
+    5.~$A^{\pi}(S_t,a_t)$\\
+    6.~$r_t + V(S_{t+1}) - V(S_t)$\\
+    For $\Psi_t = A^\pi(S_t,a_t)$(actually we do not know what it actually is,but we have to estimate it)
+    We know $A^\pi(S,a)$ = $Q^\pi(S,a)$  $-V^\pi(S,a)$,measures whether or not the action is better or worse than the policy's default behavior.Then,with the gradient term $\Psi_t\nabla log\pi_{\theta}(a_t|S_t)$ points in the direction of increased $\pi_{\theta}(a_t,S_t)$ if and only if $A^{\pi}(a_t,S_t)>0$.
+    
+    \item \large{\bf Discount factor $\gamma$}\\
+    The discount factor $\gamma$ we see in $\sum_{t=0}^{\infty}{\gamma}^{t}r_{t}$ is actually a control term to reduce variance.Here we have to define the discounted approximation to the policy gradient first:\\
+    \large$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~g^{\gamma}$ := $\mathbb{E}{\Bigg[{\sum_{t=0}^{\infty}{A^{\pi,\gamma}(S_t,a_t){\nabla}log{\pi_{\theta}(s_t,a_t)}}}\Bigg]}$\\
+    Before we continue, we have to introduce the definition of ${\gamma}$-just.\\
+    {\bf Def.}$~~~~$The estimator $\hat{A}_t$ is ${\gamma}$-just for all t ,if\\
+    $\mathbb{E}{\Bigg[{\sum_{t=0}^{\infty}{\hat{A}_t(s_{0:\infty},a_{0:\infty}){\nabla}_{\theta}log{\pi}_{\theta}(a_t|s_t)}}\Bigg]}$ = $\mathbb{E}{\Bigg[{\sum_{t=0}^{\infty}{A^{\pi,\gamma}(S_t,a_t){\nabla}log{\pi_{\theta}(s_t,a_t)}}}\Bigg]}$\\
+    \\
+    Also,is follows\\
+    $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\mathbb{E}{\Bigg[{\sum_{t=0}^{\infty}{\hat{A}_t(s_{0:\infty},a_{0:\infty}){\nabla}_{\theta}log{\pi}_{\theta}(a_t|s_t)}}\Bigg]}$ = $g^{\gamma}$\\
+    \item \large{\bf Advantage Function Estimation}\\
+    Let $V$ be an approximate value fimctoion.\\
+    Define $\delta^{V}_{t}$=${r_t + {\gamma}V(S_{t+1})-V(S_t)}$a.k.a,the TD residual.\\
+    If we have $V = V^{\pi,\gamma}$,then it is a ${\gamma}$-just an unbiased advantage estimator of ${A^{\pi,\gamma}}$:\\
+    $~~~~~~~~~~{\mathbb{E}\Bigg[{\delta^{V^{\pi,\gamma}_t}}\Bigg]}$ $={\mathbb{E}\Bigg[{r_t + {\gamma}V^{\pi,\gamma}(S_{t+1})-V^{\pi,\gamma}(S_t)}\Bigg]}$\\
+    $~~~~~~~~~~~~~~~~~~~~~~~~~~={\mathbb{E}\Bigg[{Q^{\pi,\gamma}(S_t,a_t)}-V^{\pi,\gamma}(S_t)\Bigg]}=$
+    $A^{\pi,\gamma}(S_t,a_t).$\\
+    But ideally,this hold for only ${\gamma}$-just ${V}$,otherwise, this yield biased policy gradient estimator.\\
+    Now define $\hat{A}^{(k)}_{t} :={\sum_{l=0}^{k-1}{\gamma}^{l}{\delta}^{V}_{t+l}}$a.k.a $k$-step estimate of the returns but minus a baseline term $-V{s_t}$\\
+    Note the bias generally becomes smaller as k $\xrightarrow{}$ ${\infty}$.Taking k $\xrightarrow{}$,we get\\
+    $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hat{A}^{\infty}_{t}=-V(s_t) + {\sum_{l=0}^{\infty}{\gamma^{l}r_{t+l}}}$\\
+    Then we can define the generalized advantage estimator GAE(${\gamma},{\lambda}$),defined as the exponentially -weighted average of these k-step estimators:\\
+    $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hat{A}^{GAE({\gamma},{\lambda})}_{t}:={\sum_{l=0}^{\infty}{(\gamma\lambda)}^{l}{\delta}^{V}_{t+l}}$\\
+    we can see that\\
+    ${GAE({\gamma},0)}:~~~~\hat{A}_t:={\delta}_t~~~~~~~~~~~={r_t}+{\gamma}V(s_{t+1})-V(s{t})$\\
+    ${GAE({\gamma},0)}:~~~~\hat{A}_t:={\sum_{l=0}^{\infty}{\gamma^{l}}{{\delta}_{t+l}}}={r_t}+{\gamma}V(s_{t+1})-V(s{t})$\\
+    We can see for ${\lambda = 0}$,the TD residual form GAE we know introduce lower bias but with some bias.\\
+    For ${\lambda = 1}$,is actually MC return minus baseline.\\
+    \item \large{\bf Interpretation as reward}\\
+    Reward shaping refers to the following transformation of the reward function of an MDP:let $\Phi :{\rm S} \xrightarrow{} {\rm I\!R}$ be an arbitrary scalar-valued function on state space.\\
+    Define the transformed reward function ${\hat{r}}$ to be\\
+    $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hat{r}(s,s,s')=r(s,a,s') + {\gamma}{\Phi(s')} -{\Phi(s)}$\\
+    Then we can see that the discounted sum of rewards of a trajectory starting with state $S_t:$\\
+    $\sum_{l=0}^{\infty}{{\gamma}^{l}\hat{r}(s_{t+l},a_t,s_{t+l+1})} = \sum_{l=0}^{\infty}{\gamma}^{l}r{s_{t+l},a_t,s_{t+l+1}}-{\Phi(s_t)}$\\
+    Then with the construction,let\\
+    {$\Tilde{Q}^{\pi,\gamma}(s,a)=Q^{\pi,\gamma}(s,a)-\Phi(s)$}\\
+    {$\Tilde{V}^{\pi,\gamma}(s,a)=V^{\pi,\gamma}(s,a)-\Phi(s)$}\\
+    {$\Tilde{A}^{\pi,\gamma}(s,a)=(Q^{\pi,\gamma}(s,a)-\Phi(s))-(V^{\pi,\gamma}(s,a)-\Phi(s))=A^{\pi,\gamma}(s,a)$}\\
+    Now we consider discount {\bf${\gamma\lambda}$},this is actually a steeper discount factor than ${\gamma}$ since ${0{\leq}\lambda{\leq}1}.$Now,let ${\Phi = V}$ We see that\\
+    ${\sum_{l=0}^{\infty}{(\gamma\lambda)^{l}\hat{r}(s_{t+l},a_t,s_{t+l+1})}}$
+    $={\sum_{l=0}^{\infty}{(\gamma\lambda)^{l}{\delta}^{V}_{t+l}}}=\hat{A}^{GAE({\gamma,\lambda})}_t$\\
+    It's useful to introduce the notion of a response function $\mathcal{X}$
+    It's defined as follows:\\
+    $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\mathcal{X}(l;s_t,a_t)=\mathbb{E}\big[{r_{t+l}|s_t,a_t}\big]-\mathbb{E}\big[{r_{t+l}|s_t}\big]$\\
+    Note that ${A^{\pi,\gamma}(s,a)}=\sum_{l=0}^{\infty}{\gamma}^{l}{\mathcal{X}(l;s,a)}$\\
+    We can see that \\
+    ${\nabla_{\theta} log {\pi}_{\theta}(a_t|s_t)A^{\pi,\gamma}(s_t,a_t)}$ = ${\nabla_{\theta}log {\pi}_{\theta}(a_t|s_t){\sum_{l=0}^{\infty}\mathcal{X}(l;s_t,a_t)}}$\\
+    Using a discount ${\gamma <1}$ corresponding to dropping the terms with $l \gg 1/(1-{\gamma})$\\
+    Thus the error introduced by the approximation will be small if ${\mathcal{X}}$ rapidly decays as l increases,i.e,if the effect of an action on rewards is 'forgotten' after $\approx 1/(1-\gamma)$ timesteps.
+    
+\end{itemize} 
+
+

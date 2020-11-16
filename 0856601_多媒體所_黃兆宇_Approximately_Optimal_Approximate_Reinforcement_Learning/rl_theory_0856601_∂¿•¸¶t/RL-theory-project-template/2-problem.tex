@@ -1,0 +1,56 @@
+\section{Problem Formulation}
+\label{section:problem}
+\begin{itemize}
+    \item Notations
+    \paragraph{Markov decision process(MDP)\\}
+    Defined by the tuple $(S, D, A, \mathcal{R}, {P(s';s,a)})$ where: $S$ is a finite set of states, $D$ is the 
+    starting state distribution, $A$ is a finite set of actions, $\mathcal{R}$ is a reward function $\mathcal{R}:S \times A \to [0, R]$, and ${P'(s';s,a)}$ are the transition probabilities, with ${P'(s';s,a)}$ giving the next-state distribution upon taking action $a$ in state $s$.
+    
+    \paragraph{Value\\}
+    Given $ 0 \leqslant \gamma < 1 $, we define the value function for a given policy $\pi$ as:
+    \[V_{\pi}(s) \equiv (1 - \gamma) E \bigg[\sum_{t=0}^{\infty}\gamma^{t}\mathcal{R}(s_{t},a_{t}) | \pi,s\bigg]\]
+    $(1 - \gamma)$ is for normalization, so $V_{\pi}(s) \in [0,R]$
+    
+    
+    \paragraph{State-action value \\}
+    We define state-action value as:
+    \[Q_{\pi}(s,a) \equiv (1 - \gamma) \mathcal{R}(s,a) + {\gamma}E_{s^{'}{\thicksim}P(s^{'};s,a)} [V_{pi}(s^{'})]\]
+    $Q_{\pi}(s,a) \in [0,R]$ due to normalization.
+    
+    
+    \paragraph{Advantage}
+    \[A_{\pi}(s,a) \equiv Q_{\pi}(s,a) - V_{\pi}(s)\]
+    $A_{\pi}(s,a) \in [-R, R]$ due to normalization.
+    
+    
+    \paragraph{Restart distribution \\} Draws the next state from the distribution $\mu$.\\
+    
+    
+    \paragraph{$\gamma$-discount future state distribution \\} $\gamma$-discount future state distribution for
+    a starting state distribution $\mu$:
+    \[d_{\pi,\mu}(s) \equiv (1 - \gamma) \sum_{t=0}^{\infty} \gamma^{t} Pr(st=s;\pi, \mu) \] \\
+    
+    
+    
+    \item The optimization problem of interest
+    \paragraph{}
+    The goal of algorithm is to maximize the discounted reward from the start distribution $D$,
+    \[\eta_{D} \equiv E_{s{\thicksim}D}[V_{\pi}(s)]\]
+    The optimal policy exists which can maximize $V_{\pi}(s)$ for all states. \\
+    
+    \newpage
+    \item The technical assumptions
+    \paragraph{Restart distribution \\}
+    The author desire an algorithm which uses only the MDP M and assumes access
+    to restart distribution $\mu$.
+    \paragraph{Approximate greedy policy chooser \\} 
+    Crudely, the greedy policy chooser outputs a policy that usually chooses actions with largest state-action values of the current policy, ie it output
+    an "approximate" optimal policy.
+    
+    \paragraph{Goal of the agent \\}
+    Only consider the case where maximize the $\gamma$-discounted average reward
+    from the start distribution D.
+    
+    
+    
+\end{itemize}

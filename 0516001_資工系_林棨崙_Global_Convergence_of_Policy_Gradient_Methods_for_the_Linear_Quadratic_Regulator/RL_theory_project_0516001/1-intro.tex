@@ -1,0 +1,17 @@
+\section{Introduction}
+
+\subsection{Paper overview}
+Sampling based reinforcement learning algorithms such as policy gradient methods, is little theoretical guarantees to their efficiency. In contrast, control theory has a rich body of tools, with provable guarantees, for related sequential decision making problems, particularly those that involve continuous control. They often estimate an explicit dynamical model first (via system identification) and then design optimal controllers.\newline
+This paper leverages the optimal control theory and mathematical optimization, to derive the theoretical guarantee of the policy gradient method.
+
+
+\subsection{Main contributions}
+This paper proves that while using local search method to deal with a non-convex problem, it may find the globally optimal policy. It is divided into three cases:\newline
+
+\begin{itemize}
+    \item Exact gradient evaluation: This paper shows that descent gradient method indeed converges to the optimal policy.
+    \item Model free cases: Instead of the model, using simulated trajectories in a stochastic policy gradient method is proofed to converge to a globally optimal policy, with polynomially computational and sample complexities.
+    \item The natural policy gradient: This paper shows it improves convergence rate considerably compared too its naive gradient counterpart.
+\end{itemize}
+
+

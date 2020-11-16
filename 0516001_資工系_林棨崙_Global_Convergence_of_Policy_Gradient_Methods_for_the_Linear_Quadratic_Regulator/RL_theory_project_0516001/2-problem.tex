@@ -1,0 +1,38 @@
+\section{Problem Formulation}
+\subsection{Optimal control problem and LQR}
+The system of the optimal control problem can be described as
+\begin{equation}
+x_{t+1}=f_t(x_t,u_t,w_t),
+\end{equation}\newline
+where $x$ is the state of system, and $u$, $w$ are referred as the action and the disturbance. Function $f$ maps the state, the action, and the disturbance to the next state $x_{t+1}$. The objective is to find $u_t$ which minimizes the cost $c_t$,\newline
+
+\begin{equation}
+    \textrm{minimize }   \Sigma_{t=0}^T c_t(x_t,u_t)  \newline
+\end{equation}\newline
+\begin{equation}
+    \textrm{ such that }   x_{t+1} = f_t(x_t, u_t, w_t), t=0...T
+\end{equation}\newline
+
+Considering the linearized control problem, the system is approximated by $x_{t+1}=A_t x_t+B_t x_t+w_t$, and the cost function can be approximated by a quadratic function in state and action. The linear quadratic regulator (LQR) problem is the linearized control problem, combined with homogeneous time, infinite horizon condition, and can be written as
+\begin{equation}
+    \textrm{minimize }   \mathbb{E}[\Sigma_{t=0}^\infty (x_t^T Q x_t+u_t^T R u_t)]  \newline
+\end{equation}\newline
+\begin{equation}
+    \textrm{ such that }   x_{t+1} = Ax_t+Bu_t,x_0\sim D
+\end{equation}\newline
+The initial state is distributed as distribution D. The mactrices A and B are referred as transition mactrices. Q and R are positive definite matrices which parameterize the costs.\newline
+Optimal control theory shows that the action can be written as a linear function in the state,
+\begin{equation}
+    u_t=-K^* x_t
+\end{equation}\newline
+\begin{equation}
+    K^* = -(B^T PB + R)^-1 B^T PA
+\end{equation}\newline
+For the LQR problem, planning P can be achieved by solving  the Algebraic Riccati Equation (ARE),
+\begin{equation}
+    P = A^T PA+Q-A^T PB(B^T PB+R)^-1 B^T PA
+\end{equation}\newline
+
+\subsection{Technical assumption}
+The paper assumes that cost of state-action map function K ($C(K_0)$) is finite, and does not consider the initial state $x_0$  with the noise disturbance.
+

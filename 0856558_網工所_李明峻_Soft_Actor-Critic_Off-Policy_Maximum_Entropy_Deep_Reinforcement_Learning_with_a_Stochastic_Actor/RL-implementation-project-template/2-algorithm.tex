@@ -1,0 +1,10 @@
+\section{Background and The Algorithm}
+\label{section:algorithm}
+Please present the essential background knowledge and the algorithm in this section. You may also describe the notations and the optimization problem of interest.
+\pi^* = argmax_\pi E_{(s_t, a_t)~\rho_\pi}[\sumR(s_t, a_t)]
+
+Besides maximum entropy, we also want to find the maximum action entropy of each trajectory
+
+\pi^* = argmax_\pi E_{(s_t, a_t)~\rho_\pi}[\sumR(s_t, a_t)+\alphaH(\pi(.|_t))]
+In order to randomize policy, so the action distribution is randomized
+Finding maximum entropy let us to construct a neural network which can explore existing better path, 

@@ -1,0 +1,20 @@
+\section{Conclusion}
+\label{section:conclusion}
+Please provide succinct concluding remarks for your report. You may discuss the following aspects:
+\begin{itemize}
+    \item The potential future research directions \\
+    This paper prove the Conservative Policy Iteration can find the optimal policy after reasonable update times, the future research direction can be applying the algorithm in the existing reinforcement learning environment (ex.gym in python) to evaluate the performance of the algorithm. It can be compared with the traditional value-iteration, policy iteration algorithm for solving the game like Taxi-v2, FrozenLake8x8, etc. \\
+    And a MDP environment like Figure3.2 can be created, with this environment, Conservative Policy Iteration
+    can compare its performance with policy gradient method to see if the problem of unbalance updating on two states can be reduced by the introducing of restart distribution and conservative policy update rule (by comparing $\rho(i)$ and $\rho(j)$). \\
+    \item Technical limitations \\
+    In this algorithm, in the step 2 of Conservative Policy Iteration, to estimate $A_{\pi, \mu}(\pi')$, we 
+    need to compute the expectation value of $A_{\pi}(s,a)$, but if the state number is very large or the action is continuous, the program will take unreasonable computation time and memory. This could be solved by applying "sampling" to estimate the true expectation value (ex. Monte Carlo method). \\
+    \item Latest results on the problem of interest \\
+    Trust Region Policy Optimization (TRPO) [\cite{DBLP:journals/corr/SchulmanLMJA15}] is also an algorithm that can optimize the policy and which is effective for finding large nonlinear policies. And the theorem 4.1 of this paper is also a theoretical basis for the prove of TRPO. 
+    And compare to TRPO, Proximal Policy Optimization (PPO) 
+    [\cite{DBLP:journals/corr/SchulmanWDRK17}] is another algorithm in
+    the policy gradient family which is much simpler to implement, and enable the
+    multiple epochs of minibatch multiple epochs of minibatch policy gradient updates.
+    
+    
+\end{itemize}
